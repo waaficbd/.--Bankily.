@@ -10,18 +10,17 @@
 
     <style>
         :root {
-            /* Bankily / BIM Colors */
-            --bankily-green: #008751;         /* Primary Brand Green */
-            --bankily-green-dark: #00633b;
-            --bankily-orange: #f37021;        /* Accent Orange */
-            --bankily-orange-dark: #d65b12;
-            --bankily-yellow: #ffc107;        /* Secondary Highlight */
-            --bg-color: #f4f8f5;
+            /* Bankily official logo colors (Teal/Cyan & Bright Yellow) */
+            --bankily-teal: #008299;          /* Bright Teal/Cyan Blue */
+            --bankily-teal-dark: #005f70;
+            --bankily-yellow: #f5b800;        /* Bright Golden Yellow */
+            --bankily-yellow-dark: #d9a300;
+            --bg-color: #f2f8f9;
             --card-bg: #ffffff;
-            --calc-bg: #eaf5ee;             /* Soft Green Tint */
+            --calc-bg: #e6f4f7;             /* Soft Light Cyan Tint */
             --text-main: #111111;
             --text-muted: #555555;
-            --slider-track: #c2e0d1;
+            --slider-track: #b8e0e8;
         }
 
         * {
@@ -39,10 +38,10 @@
             min-height: 100vh;
         }
 
-        /* Top Header Navigation Bar - Bankily Green Base */
+        /* Top Header Navigation Bar - Bankily Teal Base */
         .app-header {
             width: 100%;
-            background-color: var(--bankily-green);
+            background-color: var(--bankily-teal);
             height: 60px;
             padding: 0 20px;
             display: flex;
@@ -64,12 +63,12 @@
         }
 
         .header-title .region {
-            color: #ffffff;
+            color: #111111;
             font-size: 11px;
             margin-right: 8px;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
-            background: var(--bankily-orange);
+            background: var(--bankily-yellow);
             padding: 2px 8px;
             border-radius: 4px;
         }
@@ -99,7 +98,7 @@
             padding: 30px 24px;
             border-radius: 20px;
             box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
-            border: 1px solid #d2e5d9;
+            border: 1px solid #d0e7ed;
             display: flex;
             flex-direction: column;
         }
@@ -124,14 +123,14 @@
         /* Calculator Inner Container */
         .calculator-container {
             background: var(--calc-bg);
-            border: 1px solid #c2e2cf;
+            border: 1px solid #c0e3eb;
             border-radius: 14px;
             padding: 22px 18px 18px;
             margin-bottom: 24px;
         }
 
         .calculator-title {
-            color: var(--bankily-green-dark);
+            color: var(--bankily-teal-dark);
             font-weight: 800;
             font-size: 17px;
             margin-bottom: 22px;
@@ -155,7 +154,7 @@
             color: #ffffff; 
             font-weight: 800; 
             font-size: 14px;
-            background: var(--bankily-green);
+            background: var(--bankily-teal);
             padding: 2px 8px;
             border-radius: 6px;
         }
@@ -185,7 +184,7 @@
             height: 22px;
             width: 22px;
             border-radius: 50%;
-            background: var(--bankily-orange);
+            background: var(--bankily-yellow);
             border: 2px solid #ffffff;
             cursor: pointer;
             -webkit-appearance: none;
@@ -205,7 +204,7 @@
             height: 22px;
             width: 22px;
             border-radius: 50%;
-            background: var(--bankily-orange);
+            background: var(--bankily-yellow);
             border: 2px solid #ffffff;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -222,7 +221,7 @@
         /* Monthly Payment Results */
         .result-container {
             background: #ffffff;
-            border: 1px solid #c2e2cf;
+            border: 1px solid #c0e3eb;
             border-radius: 12px;
             padding: 16px;
             display: flex;
@@ -239,7 +238,7 @@
         }
 
         .result-amount {
-            color: var(--bankily-orange);
+            color: var(--bankily-teal);
             font-size: 20px;
             font-weight: 800;
         }
@@ -251,10 +250,10 @@
             margin-top: 12px;
         }
 
-        /* Primary Action Button - Bankily Orange */
+        /* Primary Action Button - Bankily Bright Yellow */
         .btn-apply {
-            background: var(--bankily-orange);
-            color: #ffffff;
+            background: var(--bankily-yellow);
+            color: #111111;
             border: none;
             width: 100%;
             padding: 16px;
@@ -264,11 +263,11 @@
             cursor: pointer;
             margin-bottom: 28px;
             transition: background-color 0.2s, transform 0.1s;
-            box-shadow: 0 4px 12px rgba(243, 112, 33, 0.35);
+            box-shadow: 0 4px 12px rgba(245, 184, 0, 0.4);
         }
 
         .btn-apply:active {
-            background-color: var(--bankily-orange-dark);
+            background-color: var(--bankily-yellow-dark);
             transform: scale(0.99);
         }
 
@@ -294,9 +293,9 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            background: #eaf5ee;
+            background: #e6f4f7;
             border-radius: 10px;
-            border: 1px solid #c2e2cf;
+            border: 1px solid #c0e3eb;
         }
 
         .feature-text {
@@ -308,7 +307,7 @@
         .feature-title {
             font-size: 15px;
             font-weight: 700;
-            color: var(--bankily-green);
+            color: var(--bankily-teal);
         }
 
         .feature-desc {
@@ -330,7 +329,7 @@
 
 <body>
 
-<!-- Bankily Green Header Navigation Bar -->
+<!-- Bankily Teal Header Navigation Bar -->
 <div class="app-header">
     <div style="width: 24px;"></div>
     <div class="header-title">
@@ -396,8 +395,8 @@
         <div class="feature-item">
             <div class="feature-icon-svg">
                 <!-- Lightning Bolt Icon -->
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="#f37021" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="#008751" stroke-width="1.5" stroke-linejoin="round"/>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#f5b800" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="#008299" stroke-width="1.5" stroke-linejoin="round"/>
                 </svg>
             </div>
             <div class="feature-text">
@@ -424,9 +423,9 @@
     </div>
 </div>
 
-<!-- Footer -->
+<!-- Footer with BPM (Banque Populaire de Mauritanie) -->
 <div class="footer-banner">
-    © 2026 Bankily - البنك الوطني لموريتانيا (BIM)
+    © 2026 Bankily - البنك الشعبي الموريتاني (BPM)
 </div>
 
 <script>
